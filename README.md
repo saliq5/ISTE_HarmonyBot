@@ -8,6 +8,7 @@ This chatbot is created using the open-source Llama 2 LLM model from Meta and it
 streamlit
 replicate
 sqlite3
+toml
 ```
 
 ## Getting your own Replicate API token
