@@ -1,13 +1,12 @@
 # 🦙💬 Llama 2 Chat
 
-This chatbot is created using the open-source Llama 2 LLM model from Meta and it saves the user input in the sqlite db.
+This chatbot is created using the open-source Llama 2 LLM model from Meta and it saves the user input in the text file.
 
 ## Prerequisite libraries
 
 ```
 streamlit
 replicate
-sqlite3
 toml
 ```
 
@@ -25,7 +24,7 @@ Replace the API token in ` .streamlit/secrets.toml `
 ```
 git clone https://github.com/saliq5/ISTE_HarmonyBot
 cd ISTE_HarmonyBot
-git checkout feature/user-input-storage
+git checkout chatbot
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
