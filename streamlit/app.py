@@ -5,7 +5,7 @@ import os
 import toml
 import json
 
-FLASK_API_URL = "http://localhost:5000/predictdata"
+FLASK_API_URL = "http://172.16.238.2:5000/predictdata"
 
 # Function to load API token from .streamlit/secrets.toml
 def load_api_token():
