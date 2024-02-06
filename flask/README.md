@@ -20,7 +20,7 @@ docker run -d -p 5000:5000 -v $(pwd):/app flask
 or if you want to save build time use the following docker image
 
 ```
-docker pull w453y/iste-harmonybot
-docker run -d -p 5000:5000 w453y/iste-harmonybot
+docker pull w453y/iste-harmonybot-model
+docker run -d -p 5000:5000 w453y/iste-harmonybot-model
 ```
 NOTE: The bot is available at `http://localhost:5000/predictdata`
