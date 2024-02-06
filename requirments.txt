@@ -1,0 +1,9 @@
+spacy
+gensim
+pandas
+Flask
+nltk
+torch
+transformers
+scikit-learn
+matplotlib
