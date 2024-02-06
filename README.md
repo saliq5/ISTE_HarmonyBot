@@ -31,10 +31,3 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 streamlit run app.py
 ```
-
-### Access the saved User_Input from Database
-
-```
-sqlite3 llama_db.db
-sqlite> SELECT * FROM user_input;
-```
