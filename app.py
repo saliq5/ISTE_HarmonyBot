@@ -87,6 +87,8 @@ for message in st.session_state.messages:
 
 def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    with open(user_input.txt, "w") as file:
+        file.write("")
 
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
