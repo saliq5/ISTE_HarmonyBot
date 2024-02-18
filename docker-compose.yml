@@ -1,0 +1,36 @@
+version: '3.8'
+
+networks:
+  my_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1
+
+services:
+  app1:
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    networks:
+      my_network:
+        ipv4_address: 172.16.238.2
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask:/app
+    restart: always
+  
+  app2:
+    build:
+      context: ./streamlit
+      dockerfile: Dockerfile
+    networks:
+      my_network:
+        ipv4_address: 172.16.238.3
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit:/app
+    restart: always
