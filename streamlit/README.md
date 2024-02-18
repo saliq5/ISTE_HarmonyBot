@@ -37,9 +37,3 @@ docker build -t chatbot .
 docker run -p 8501:8501 -v $(pwd):/app chatbot
 ```
 
-or if you want to save build time use the following docker image
-
-```
-docker pull w453y/iste-harmonybot
-docker run -d -p 5000:5000 w453y/iste-harmonybot
-```
