@@ -63,7 +63,7 @@ background_image = """
 <style>
 [data-testid="stAppViewContainer"] > .main {
     
-    background-image: url("https://img.freepik.com/free-vector/tropical-green-leaves-background_52683-37117.jpg?w=996&t=st=1708459946~exp=1708460546~hmac=d59bb1fea68f5d230d07abd18d26e1c7fe8d5769b915bbdddce80390a58c3ca3");
+    background-image: url("bg.png");
     background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
     background-position: center;  
     background-repeat: no-repeat;
