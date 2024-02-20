@@ -3,7 +3,6 @@ import streamlit as st
 import replicate
 import os
 import toml
-import json
 
 FLASK_API_URL = "http://172.16.238.2:5000/predictdata"
 
@@ -24,51 +23,53 @@ def get_recommendations_from_flask():
         user_input = file.read()
     response = requests.post(FLASK_API_URL, data={"Text": user_input})
     json_response = response.json()
-    
-    num_columns = 3  # Define the number of columns for the layout
-    chunks = [json_response[i:i+num_columns] for i in range(0, len(json_response), num_columns)]  # Split the recommendations into chunks
 
-    for chunk in chunks:
-        cols = st.columns(len(chunk))
-        for col, item in zip(cols, chunk):
-            with col:
-                st.image(item["image_url"], width=200)
-                st.write(item["name"])
-                st.write(f"Spotify URL: {item['spotify_url']}")
+    recommendations = []
+    for item in json_response:
+        song_name = item["name"]
+        spotify_url = item["spotify_url"]
+        image_url = item["image_url"]
+        recommendations.append((song_name, spotify_url, image_url))
+
+    return recommendations
 
 # App title
-st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
+st.set_page_config(page_title="ISTE-HarmonyBot", layout="wide")
 
-# Replicate Credentials
-with st.sidebar:
-    st.title('🦙💬 Llama 2 Chatbot')
+# Load API token from .streamlit/secrets.toml
+replicate_api = load_api_token()
 
-    # Load API token from .streamlit/secrets.toml
-    replicate_api = load_api_token()
+# Set the model to 'Llama2-13B' (fixed value)
+selected_model = 'Llama2-13B'
+llm = "meta/llama-2-13b-chat:f4e2de70d66816a838a89eeeb621910adffb0dd0baba3976c96980970978018d"
 
-    if replicate_api:
-        st.success('API key loaded from secrets.toml!', icon='✅')
-    else:
-        st.warning('API key not found in secrets.toml. Please enter your credentials!', icon='⚠️')
-        replicate_api = st.text_input('Enter Replicate API token:', type='password')
+# Set fixed values for temperature, top_p, and max length
+temperature = 0.75
+top_p = 1.0
+max_length = 800
 
-    # Set the model to 'Llama2-13B' (fixed value)
-    selected_model = 'Llama2-13B'
-    llm = "meta/llama-2-13b-chat:f4e2de70d66816a838a89eeeb621910adffb0dd0baba3976c96980970978018d"
-
-    # Set fixed values for temperature, top-p, and max length
-    temperature = 0.75
-    top_p = 1.0
-    max_length = 800
-
-    # Set values for additional parameters
-    debug = False
-    top_k = 50
-    system_prompt = "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
-    max_new_tokens = 500
-    min_new_tokens = -1
+# Set values for additional parameters
+debug = False
+top_k = 50
+system_prompt = "You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information."
+max_new_tokens = 500
+min_new_tokens = -1
 
 os.environ['REPLICATE_API_TOKEN'] = replicate_api
+
+# Set the background image
+background_image = """
+<style>
+[data-testid="stAppViewContainer"] > .main {
+    background-image: url("https://wallpaperaccess.com/full/5732729.jpg");
+    background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
+    background-position: center;  
+    background-repeat: no-repeat;
+}
+</style>
+"""
+
+st.markdown(background_image, unsafe_allow_html=True)
 
 # Check if the text file exists, if not, create it
 text_file_path = "user_input.txt"
@@ -76,8 +77,8 @@ if not os.path.exists(text_file_path):
     with open(text_file_path, "w"):
         pass
 
-# Store LLM generated responses
-if "messages" not in st.session_state.keys():
+# Store LLM generated responses in session_state
+if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
 
 # Display or clear chat messages
@@ -88,9 +89,7 @@ for message in st.session_state.messages:
 def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
     with open(text_file_path, "w") as file:
-        file.write("")
-
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+        file.write("")  # Clear the content of the user_input.txt file
 
 # Function for generating LLaMA2 response
 def generate_llama2_response(prompt_input):
@@ -130,8 +129,18 @@ with recommendation_container:
     if st.button("Recommended", help="Click to get recommendations"):
         st.session_state.recommended_button_clicked = True
         recommendations = get_recommendations_from_flask()
-        # st.title("Recommended Songs")
-        # st.json(recommendations)
+        num_columns = 3
+        chunks = [recommendations[i:i+num_columns] for i in range(0, len(recommendations), num_columns)]
+        for chunk in chunks:
+            cols = st.columns(len(chunk))
+            for col, (song_name, spotify_url, image_url) in zip(cols, chunk):
+                with col:
+                    st.image(image_url, width=300)
+                    st.markdown(f"[{song_name}]({spotify_url})")
+
+
+# Clear Chat History button
+st.button('Clear Chat History', on_click=clear_chat_history)
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not replicate_api):
@@ -141,8 +150,8 @@ if prompt := st.chat_input(disabled=not replicate_api):
     with st.chat_message("user"):
         st.write(prompt)
 
-# Generate a new response if last message is not from assistant
-if st.session_state.messages[-1]["role"] != "assistant":
+# Generate a new response if the last message is not from the assistant
+if st.session_state.messages and st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             response = generate_llama2_response(prompt)
@@ -152,5 +161,4 @@ if st.session_state.messages[-1]["role"] != "assistant":
                 full_response += item
                 placeholder.markdown(full_response)
             placeholder.markdown(full_response)
-    message = {"role": "assistant", "content": full_response}
-    st.session_state.messages.append(message)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
