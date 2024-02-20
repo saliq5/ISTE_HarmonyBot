@@ -34,7 +34,7 @@ def get_recommendations_from_flask():
     return recommendations
 
 # App title
-st.set_page_config(page_title="ISTE-HarmonyBot")
+st.title("ISTE-HarmonyBot")
 
 # Load API token from .streamlit/secrets.toml
 replicate_api = load_api_token()
@@ -58,9 +58,11 @@ min_new_tokens = -1
 os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
 # Set the background image
+# background-image: url("https://wallpaperaccess.com/full/5732729.jpg");
 background_image = """
 <style>
 [data-testid="stAppViewContainer"] > .main {
+    
     background-image: url("https://wallpaperaccess.com/full/5732729.jpg");
     background-size: 100vw 100vh;  # This sets the size to cover 100% of the viewport width and height
     background-position: center;  
@@ -99,7 +101,7 @@ def generate_llama2_response(prompt_input):
         if dict_message["role"] == "user":
             string_dialogue += "User: " + dict_message["content"] + "\n\n"
             break  # Stop after adding the most recent user input
-    output = replicate.run(llm, 
+    output = replicate.run(llm,
                            input={
                                "prompt": f"{string_dialogue} {prompt_input} Assistant: ",
                                "temperature": temperature,
@@ -121,12 +123,22 @@ def save_user_input_to_file(user_input):
     with open(text_file_path, "a") as file:
         file.write(user_input + "\n")
 
+# Clear Chat History button
+st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+
+#markdown content on the sidebar
+st.sidebar.markdown('''**Feeling chatty, my friend?**
+
+Want to chat about anything and everything under the sun? Make llama2 your chatty companion. But I also have a hidden talent – I can be your personal music DJ!
+
+By analyzing our conversation, I can get a sense of your current mood. Feeling peppy and adventurous? Or maybe calm and introspective? Whatever your vibe, clicking "Recommend" unlocks a personalized Spotify playlist just for you! ✨''')
+
 # Container for the "Recommended" button
 recommendation_container = st.container()
 
 # Recommended button positioned in the top left corner
 with recommendation_container:
-    if st.button("Recommended", help="Click to get recommendations"):
+    if st.sidebar.button("Recommend", help="Click to get recommendations"):
         st.session_state.recommended_button_clicked = True
         recommendations = get_recommendations_from_flask()
         num_columns = 3
@@ -140,7 +152,7 @@ with recommendation_container:
 
 
 # Clear Chat History button
-st.button('Clear Chat History', on_click=clear_chat_history)
+# st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not replicate_api):
