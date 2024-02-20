@@ -34,7 +34,7 @@ def get_recommendations_from_flask():
     return recommendations
 
 # App title
-st.set_page_config(page_title="ISTE-HarmonyBot", layout="wide")
+st.set_page_config(page_title="ISTE-HarmonyBot")
 
 # Load API token from .streamlit/secrets.toml
 replicate_api = load_api_token()
@@ -135,7 +135,7 @@ with recommendation_container:
             cols = st.columns(len(chunk))
             for col, (song_name, spotify_url, image_url) in zip(cols, chunk):
                 with col:
-                    st.image(image_url, width=300)
+                    st.image(image_url, width=200)
                     st.markdown(f"[{song_name}]({spotify_url})")
 
 
